@@ -1,3 +1,105 @@
+local UIS = game:GetService("UserInputService")
+local Player = game.Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkiedarkie/dark/-/raw/main/Spawner.lua"))()
-Spawner.Load()
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = PlayerGui
+
+-- Create black background frame (draggable)
+local background = Instance.new("Frame")
+background.Parent = screenGui
+background.Size = UDim2.new(0, 220, 0, 150) -- Taller frame for watermark
+background.Position = UDim2.new(0.5, -110, 0.5, -75)
+background.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+background.BorderSizePixel = 0
+local bgCorner = Instance.new("UICorner")
+bgCorner.CornerRadius = UDim.new(0, 12)
+bgCorner.Parent = background
+
+-- Dragging function
+local dragging = false
+local dragStart, startPos
+
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	background.Position = UDim2.new(
+		startPos.X.Scale, startPos.X.Offset + delta.X,
+		startPos.Y.Scale, startPos.Y.Offset + delta.Y
+	)
+end
+
+background.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = background.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+background.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		if dragging then
+			updateDrag(input)
+		end
+	end
+end)
+
+-- Watermark label
+local watermark = Instance.new("TextLabel")
+watermark.Parent = background
+watermark.Size = UDim2.new(1, -20, 0, 20)
+watermark.Position = UDim2.new(0, 10, 0, 5)
+watermark.BackgroundTransparency = 1
+watermark.Text = "Eksova Scripts"
+watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
+watermark.Font = Enum.Font.GothamBold
+watermark.TextSize = 14
+watermark.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Create READY MOONCAT button (toggleable)
+local button1 = Instance.new("TextButton")
+button1.Parent = background
+button1.Size = UDim2.new(1, -20, 0, 40)
+button1.Position = UDim2.new(0, 10, 0, 30) -- Moved down for watermark space
+button1.BackgroundColor3 = Color3.fromRGB(149, 77, 255) -- Purple
+button1.Text = "READY MOONCAT"
+button1.TextColor3 = Color3.fromRGB(255, 255, 255)
+button1.Font = Enum.Font.GothamBold
+button1.TextSize = 18
+button1.BorderSizePixel = 0
+local corner1 = Instance.new("UICorner")
+corner1.CornerRadius = UDim.new(1, 0)
+corner1.Parent = button1
+
+-- Create PLACE MOONCAT button
+local button2 = Instance.new("TextButton")
+button2.Parent = background
+button2.Size = UDim2.new(1, -20, 0, 40)
+button2.Position = UDim2.new(0, 10, 0, 80)
+button2.BackgroundColor3 = Color3.fromRGB(236, 108, 176) -- Pink
+button2.Text = "PLACE MOONCAT"
+button2.TextColor3 = Color3.fromRGB(255, 255, 255)
+button2.Font = Enum.Font.GothamBold
+button2.TextSize = 18
+button2.BorderSizePixel = 0
+local corner2 = Instance.new("UICorner")
+corner2.CornerRadius = UDim.new(1, 0)
+corner2.Parent = button2
+
+-- Toggle on/off function for button1
+local mooncatReady = false
+button1.MouseButton1Click:Connect(function()
+	mooncatReady = not mooncatReady
+	if mooncatReady then
+		button1.Text = "MOONCAT: ON"
+	else
+		button1.Text = "READY MOONCAT"
+	end
+end)
